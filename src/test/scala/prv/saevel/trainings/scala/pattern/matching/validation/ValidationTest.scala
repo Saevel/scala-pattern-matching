@@ -35,7 +35,7 @@ class ValidationTest extends WordSpec with Matchers with PropertyChecks {
     surname <- Gen.alphaStr
   } yield PersonalData(name, surname, age, pesel)
 
-  private val correctPersonalData = personalDataByPeselAndAge(correctPesels, correctAges)
+  private def correctPersonalData = personalDataByPeselAndAge(correctPesels, correctAges)
 
   private val incorrectPersonalData = Gen.oneOf(
     personalDataByPeselAndAge(correctPesels, incorrectAges),
@@ -71,11 +71,7 @@ class ValidationTest extends WordSpec with Matchers with PropertyChecks {
 
   private val correctUsers = users(correctPersonalData, correctContactData)
 
-  private val incorrectUsers = Gen.oneOf(
-    users(correctPersonalData, incorrectContactData),
-    users(incorrectPersonalData, correctContactData),
-    users(incorrectPersonalData, incorrectContactData)
-  )
+  private val incorrectUsers = users(incorrectPersonalData, incorrectContactData)
 
   "Validator" when {
 
