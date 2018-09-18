@@ -2,13 +2,15 @@ package prv.saevel.trainings.scala.pattern.matching.extractors
 
 import java.io.{FileNotFoundException, IOException}
 
+import org.junit.runner.RunWith
 import org.scalacheck.Gen
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.prop.PropertyChecks
 
 import scala.util.{Failure, Success, Try}
 
-
+@RunWith(classOf[JUnitRunner])
 class PostProcessorTest extends WordSpec with Matchers with PropertyChecks {
 
   private val exceptionMessage = "thrown on purpose"
@@ -25,7 +27,7 @@ class PostProcessorTest extends WordSpec with Matchers with PropertyChecks {
     new ArithmeticException(exceptionMessage)
   ).map(Failure(_))
 
-  private val executionFailure: Gen[Try[Int]] = Gen.oneOf[Exception](
+  private val executionNonRuntimeFailure: Gen[Try[Int]] = Gen.oneOf[Exception](
     new IOException(exceptionMessage),
     new FileNotFoundException(exceptionMessage)
   ).map(Failure(_))
@@ -41,21 +43,21 @@ class PostProcessorTest extends WordSpec with Matchers with PropertyChecks {
 
     "parsing failed" should {
 
-      "report an unretryable failure" in forAll(parseFailure, Gen.oneOf(executionSuccess, executionFailure)){ (first, second) =>
-        PostProcessor((first, second)) should be(Left(Error(second.failed.get.getMessage, false)))
+      "report an unretryable failure" in forAll(parseFailure, Gen.oneOf(executionSuccess, executionNonRuntimeFailure)){ (first, second) =>
+        PostProcessor((first, second)) should be(Left(Error(first.failed.get.getMessage, false)))
       }
     }
 
     "parsing succeeded and execution failed with a runtime exception" should {
 
-      "return a retryable failure" in forAll(parseSuccess, executionFailure) { (first, second) =>
+      "return a retryable failure" in forAll(parseSuccess, executionRuntimeFailure) { (first, second) =>
         PostProcessor((first, second)) should be(Left(Error(second.failed.get.getMessage, true)))
       }
     }
 
     "parsing succeeded and execution failed with a runtime exception" should {
 
-      "return a non-retryable failure" in forAll(parseSuccess, executionFailure) { (first, second) =>
+      "return a non-retryable failure" in forAll(parseSuccess, executionNonRuntimeFailure) { (first, second) =>
         PostProcessor((first, second)) should be(Left(Error(second.failed.get.getMessage, false)))
       }
     }

@@ -4,7 +4,7 @@ import scala.util.Try
 
 package object extractors {
 
-  type Status = (Try[Unit], Try[Int])
+  type Status[T] = (Try[Unit], Try[T])
 
   case class Error(message: String, retryable: Boolean)
 
