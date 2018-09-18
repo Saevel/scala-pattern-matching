@@ -1,0 +1,21 @@
+group 'prv.saevel.trainings.scala'
+
+version '1.0'
+
+apply plugin: 'scala'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+def scalaVersionMajor = "2.11"
+def scalaVersionMinor = "12"
+
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-library', version: "${scalaVersionMajor}.${scalaVersionMinor}"
+
+    testCompile group: 'org.scalatest', name: "scalatest_${scalaVersionMajor}", version: '3.0.5'
+    testCompile group: 'org.scalacheck', name: "scalacheck_${scalaVersionMajor}", version: '1.14.0'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
